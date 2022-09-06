@@ -12,10 +12,37 @@ exports.category_list = (req, res) => {
   };
 
 // Display detail page for a specific category.
-exports.category_detail = (req, res) => {
-  res.send(`NOT IMPLEMENTED: category detail: ${req.params.id}`);
-};
-
+exports.category_detail = (req, res, next) => {
+    console.log(req)
+    async.parallel(
+        {
+          category(callback) {
+            Category.findById(req.params.id)
+              .exec(callback);
+          }, 
+          category_plants(callback) {
+            Plant.find({ category: req.params.id }).exec(callback);
+          },
+        },
+        (err, results) => {
+          if (err) {
+            return next(err);
+          }
+          if (results.category == null) {
+            // No results.
+            const err = new Error("category not found");
+            err.status = 404;
+            return next(err);
+          }
+          // Successful, so render.
+          res.render("category_detail", {
+            title: results.category.name,
+            category: results.category,
+            category_plants: results.category_plants,
+          });
+        }
+      );
+    };
 // Display category create form on GET.
 exports.category_create_get = (req, res) => {
   res.send('NOT IMPLEMENTED: category create GET');

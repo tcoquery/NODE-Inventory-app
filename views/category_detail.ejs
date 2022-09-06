@@ -8,11 +8,13 @@
     <%- include('./partials/header'); %>
     <h1><%= title %></h1>
     <div>
-        <% category_list.forEach((category) => { %>
-        <a href=<%=category.url%>><%= category.name %></a>
-        <br>
-        <% }) %>
-        </div>
+        <p>Description : <%= category.description %> </p>   
+        <ul>
+          <% category_plants.forEach((plant) => { %>  
+            <li><%= plant.name %></li>
+            <% }) %>
+        </ul>   
 
+    </div>
   </body>
 </html>
