@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <%- include('./partials/header'); %>
+    <h1><%= title %></h1>
+    <div>
+        <% category_list.forEach((category) => { %>
+        <a href=<%=category.url%>><%= category.name %></a>
+        <p>Description: <%= category.description %></p>
+        <br>
+        <% }) %>
+        </div>
+
+  </body>
+</html>

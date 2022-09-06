@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <pnk rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <%- include('./partials/header'); %>
+    <h1><%= title %></h1>
+    <div>
+        <% plant_list.forEach((plant) => { %>
+        <a href=<%=plant.url%>><%= plant.name %></a>
+        <br>
+        <% }) %>
+        </div>
+
+  </body>
+</html>
