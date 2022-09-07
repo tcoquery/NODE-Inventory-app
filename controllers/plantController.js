@@ -1,6 +1,7 @@
 const Plant = require('../models/plants');
 const Category = require('../models/category');
 const async = require('async');
+const { body, validationResult } = require("express-validator");
 
 exports.index = (req, res) => {
     async.parallel({
@@ -54,24 +55,142 @@ exports.plant_detail = (req, res, next) => {
     };
 
 // Display plant create form on GET.
-exports.plant_create_get = (req, res) => {
-  res.send('NOT IMPLEMENTED: plant create GET');
+exports.plant_create_get = (req, res, next) => {
+  async.parallel(
+    {
+      categories(callback) {
+        Category.find(callback);
+      },
+    },
+    (err, results) => {
+      if (err) {
+        return next(err);
+      }
+      res.render("plant_form", {
+        title: "Create Plant",
+        categories: results.categories,
+      });
+    }
+  );
 };
 
 // Handle plant create on POST.
-exports.plant_create_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: plant create POST');
-};
+exports.plant_create_post = [
+  // Convert the category to an array.
+  (req, res, next) => {
+    if (!Array.isArray(req.body.category)) {
+      req.body.category =
+        typeof req.body.category === "undefined" ? [] : [req.body.category];
+    }
+    next();
+  },
+
+  // Validate and sanitize fields.
+  body("name", "Title must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("description", "Description must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("Stock", "Category must not be empty.").escape(),
+  body("price", "Price must not be empty").escape(),
+  body("category.*").escape(),
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a plant object with escaped and trimmed data.
+    const plant = new Plant({
+      name: req.body.name,
+      description: req.body.description,
+      category: req.body.category,
+      price: req.body.price,
+      stock: req.body.stock,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+
+      // Get all authors and categorys for form.
+      async.parallel(
+        {
+          categories(callback) {
+            Category.find(callback);
+          },
+        },
+        (err, results) => {
+          if (err) {
+            return next(err);
+          }
+
+          // Mark our selected categorys as checked.
+          for (const category of results.categories) {
+            if (plant.category.includes(category._id)) {
+              category.checked = "true";
+            }
+          }
+          res.render("plant_form", {
+            title: "Create plant",
+            categories: results.categories,
+            plant,
+            errors: errors.array(),
+          });
+        }
+      );
+      return;
+    }
+
+    // Data from form is valid. Save plant.
+    plant.save((err) => {
+      if (err) {
+        return next(err);
+      }
+      // Successful: redirect to new plant record.
+      res.redirect(plant.url);
+    });
+  },
+];
+
 
 // Display plant delete form on GET.
-exports.plant_delete_get = (req, res) => {
-  res.send('NOT IMPLEMENTED: plant delete GET');
+exports.plant_delete_get = (req, res, next) => {
+  async.parallel(
+    {
+      plant(callback) {
+        Plant.findById(req.params.id).exec(callback);
+      },
+    },
+    (err, results) => {
+      if (err) {
+        return next(err);
+      }
+      // Successful, so render.
+      res.render("plant_delete", {
+        title: "Delete plant",
+        plant: results.plant,
+      });
+    }
+  );
 };
 
+
 // Handle plant delete on POST.
-exports.plant_delete_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: plant delete POST');
-};
+exports.plant_delete_post = (req, res, next) => {
+
+      // plant has no plants. Delete object and redirect to the list of plants.
+      Plant.findByIdAndRemove(req.body.plantid, (err) => {
+        if (err) {
+          return next(err);
+        }
+        // Success - go to plant list
+        res.redirect("/catalog/plants");
+      });
+    }
+
 
 // Display plant update form on GET.
 exports.plant_update_get = (req, res) => {

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <%- include('./partials/header'); %>
+    <h1><%= title %></h1>
+    <div>
+        <p>Description : <%= category.description %> </p>   
+        <% if(category_plants.length) { %>
+        <p>Delete the following plants before deleting this category</p>
+        <% category_plants.forEach((plant) => {%>
+            <li><%= plant.name %></li>
+        <% })} else { %>
+            <p>Do you really want to delete this category ?</p>
+            <form action="" method="post">
+                <input type="hidden", name="categoryid", required="true", value=<%=category._id%>>
+                <button type="submit">Delete</button>
+            </form>
+        <% } %>
+    </div>
+  </body>
+</html>

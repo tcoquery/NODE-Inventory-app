@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <%- include('./partials/header'); %>
+    <h1><%= title %></h1>
+    <div>
+            <p>Do you really want to delete this plant ?</p>
+            <form action="" method="post">
+                <input type="hidden", name="plantid", required="true", value=<%=plant._id%>>
+                <button type="submit">Delete</button>
+            </form>
+    </div>
+  </body>
+</html>
