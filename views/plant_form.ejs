@@ -10,19 +10,17 @@
     <div>
         <form action="" method="post">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name">
+            <input type="text" name="name" id="name" value=<%=undefined===plant ? '' : plant.name%>>
             <label for="description">Description</label>
-            <input type="text" name="description" id="description">
-            <label for="category">Category</label>
-            <select name="category" id="category">
-                <% categories.forEach((category) => {%>
-                    <option value=<%=category._id%>><%=category.name%></option>
+            <input type="text" name="description" id="description" value=<%=undefined===plant ? '' : plant.description%>>
+            <% categories.forEach((category) => {%>
+            <label for="category._id"><%=category.name%></label>
+            <input type="checkbox" name="category", id=category._id, value=<%=category._id%>>                    
                     <% })%>
-            </select>
             <label for="price">Price</label>
-            <input type="number" name="price" id="price">
+            <input type="number" name="price" id="price" value=<%=undefined===plant ? '' : plant.stock%>>
             <label for="stock">Stock</label>
-            <input type="number" name="stock" id="stock">
+            <input type="number" name="stock" id="stock" value=<%=undefined===plant ? '' : plant.price%>>
             <button type="submit">Submit</button>
         </form>
 

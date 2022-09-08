@@ -9,9 +9,11 @@
     <h1><%= title %></h1>
     <div>
         <p>Description : <%= plant.description %> </p>
+        <p>Category : <%= plant.category.name %> </p>
         <p>Price : <%= plant.price %> €</p>
         <p>Stock : <%= plant.stock %> </p>                                                                  
     </div>
     <a href=<%=plant.url + "/delete"%>>Delete</a>
+    <a href=<%=plant.url + "/update"%>>Update</a>
   </body>
 </html>

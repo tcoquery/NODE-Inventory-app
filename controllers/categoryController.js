@@ -164,12 +164,68 @@ exports.category_delete_post = (req, res, next) => {
 };
 
 
-// Display category update form on GET.
-exports.category_update_get = (req, res) => {
-  res.send('NOT IMPLEMENTED: category update GET');
+exports.category_update_get = (req, res, next) => {
+  async.parallel(
+    {
+      category(callback) {
+        Category.findById(req.params.id)
+          .exec(callback);
+      },
+    },
+    (err, results) => {
+      if (err) {
+        return next(err);
+      }
+      if (results.category == null) {
+        // No results.
+        const err = new Error("category not found");
+        err.status = 404;
+        return next(err);
+      }
+      res.render("category_form", {
+        title: "Update category",
+        category: results.category,
+      });
+    }
+  );
 };
 
-// Handle category update on POST.
-exports.category_update_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: category update POST');
-};
+exports.category_update_post = [
+   // Validate and sanitize fields.
+  body("description", "Category description required").trim().isLength({ min: 1 }).escape(),
+  body("name", "Category name required").trim().isLength({ min: 1 }).escape(),
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    const category = new Category({ name: req.body.name, description: req.body.description, _id: req.params.id });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+        (err, results) => {
+          if (err) {
+            return next(err);
+          }
+          // Mark our selected categories as checked.
+          res.render("category_form", {
+            title: "Update category",
+            category,
+            errors: errors.array(),
+          });
+        }
+      return;
+    }
+
+    // Data from form is valid. Update the record.
+    Category.findByIdAndUpdate(req.params.id, category, {}, (err, category) => {
+      if (err) {
+        return next(err);
+      }
+
+      // Successful: redirect to plant detail page.
+      res.redirect(category.url);
+    });
+  },
+];

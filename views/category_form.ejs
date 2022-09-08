@@ -10,9 +10,9 @@
     <div>
         <form action="" method="post">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name">
+            <input type="text" name="name" id="name" value=<%=undefined===category ? '' : category.name%>>
             <label for="description">Description</label>
-            <input type="text" name="description" id="description">
+            <input type="text" name="description" id="description" value=<%=undefined===category ? '' : category.description%>>
             <button type="submit">Submit</button>
         </form>
 
